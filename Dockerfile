@@ -9,6 +9,11 @@ RUN \
   chgrp -R 0 /home/webgoat && \
   chmod -R g=u /home/webgoat
 
+# Install Aikido Zen agent
+RUN mkdir -p /opt/zen && \
+  curl -fsSL https://github.com/AikidoSec/firewall-java/releases/download/1.1.32/zen.tar.gz | tar -xz -C /opt/zen && \
+  chmod -R a+rwX /opt/zen
+
 USER webgoat
 
 COPY --chown=webgoat target/webgoat-*.jar /home/webgoat/webgoat.jar
@@ -20,6 +25,7 @@ ENV TZ=Europe/Amsterdam
 
 WORKDIR /home/webgoat
 ENTRYPOINT [ "java", \
+   "-javaagent:/opt/zen/agent.jar", \
    "-Duser.home=/home/webgoat", \
    "-Dfile.encoding=UTF-8", \
    "--add-opens", "java.base/java.lang=ALL-UNNAMED", \
